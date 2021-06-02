@@ -189,22 +189,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case IDARM_DOWN:
                 MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
-                arm_position = arm_position - pi/16;
+                arm_position = arm_position - pi/8;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 break;
             case IDARM_UP:
                 MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
-                arm_position = arm_position + pi / 16;
+                arm_position = arm_position + pi / 8;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 break;
             case IDHAND_DOWN:
                 MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
-                hand_position = hand_position - pi/16;
+                hand_position = hand_position - pi/8;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 break;
             case IDHAND_UP:
                 MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
-                hand_position = hand_position + pi/16;
+                hand_position = hand_position + pi/8;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 break;
             default:
@@ -266,12 +266,12 @@ VOID OnPaint(HDC hdc, float arm_position,float hand_position)
     int hook_x = 300;
     int hook_y = 400;
     int arm_length = 100;
-    int hand_length = 50;
+    int hand_length = 100;
     int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
     arm_position_x = arm_length * cos(arm_position) + hook_x;
     arm_position_y = arm_length * sin(arm_position) + hook_y;
-    hand_position_x = hand_length * cos(hand_position) + hook_x + arm_position_x;
-    hand_position_y = hand_length * sin(hand_position) + hook_y + arm_position_y;
+    hand_position_x = hand_length * cos(hand_position) + arm_position_x;
+    hand_position_y = hand_length * sin(hand_position) + arm_position_y;
     Graphics graphics(hdc);
     // Create a Pen object.
     Pen blackPen(Color(255, 0, 0, 0), 3);
