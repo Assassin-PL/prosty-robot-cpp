@@ -1,4 +1,4 @@
-﻿// WindowsProject1.cpp : Definiuje punkt wejścia dla aplikacji.
+// WindowsProject1.cpp : Definiuje punkt wejścia dla aplikacji.
 //
 
 #include "framework.h"
@@ -263,15 +263,15 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float a
 
 VOID OnPaint(HDC hdc, float arm_position,float hand_position)
 {
-    int hook_x = 600;
-    int hook_y = 800;
+    int hook_x = 300;
+    int hook_y = 400;
     int arm_length = 100;
     int hand_length = 50;
     int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
     arm_position_x = arm_length * cos(arm_position) + hook_x;
     arm_position_y = arm_length * sin(arm_position) + hook_y;
-    hand_position_x = hand_length * cos(hand_position) + hook_x;
-    hand_position_y = hand_length * sin(hand_position) + hook_y;
+    hand_position_x = hand_length * cos(hand_position) + hook_x + arm_position_x;
+    hand_position_y = hand_length * sin(hand_position) + hook_y + arm_position_y;
     Graphics graphics(hdc);
     // Create a Pen object.
     Pen blackPen(Color(255, 0, 0, 0), 3);
