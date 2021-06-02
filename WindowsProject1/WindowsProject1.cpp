@@ -12,8 +12,8 @@ using namespace Gdiplus;
 #define MAX_LOADSTRING 100
 
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
-void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float &arm_position, float &hand_position);
-VOID OnPaint(HDC hdc, float &arm_position, float &hand_position);
+void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
+VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
 //koniec
 HWND arm_down, arm_up, hand_down, hand_up; //arm to ramie dolne a up to ramie gorne
 
@@ -33,9 +33,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -51,12 +51,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MyRegisterClass(hInstance);
 
     // Wykonaj inicjowanie aplikacji:
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
     }
 
-    
+
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINDOWSPROJECT1));
 
@@ -74,7 +74,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     GdiplusShutdown(gdiplusToken);
 
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
 
 
@@ -90,17 +90,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWSPROJECT1));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)GetStockObject(WHITE_BRUSH);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_WINDOWSPROJECT1);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWSPROJECT1));
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_WINDOWSPROJECT1);
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
 }
@@ -117,20 +117,20 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Przechowuj dojście wystąpienia w naszej zmiennej globalnej
+    hInst = hInstance; // Przechowuj dojście wystąpienia w naszej zmiennej globalnej
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+    if (!hWnd)
+    {
+        return FALSE;
+    }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
 
-   return TRUE;
+    return TRUE;
 }
 
 //
@@ -172,54 +172,66 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         break;
     case WM_TIMER:
-        repaintWindow(hWnd, hdc, ps , NULL, arm_position, hand_position);
+        repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
         timer++;
         break;
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // Analizuj zaznaczenia menu:
+        switch (wmId)
         {
-            int wmId = LOWORD(wParam);
-            // Analizuj zaznaczenia menu:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            case IDARM_DOWN:
-                MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
-                arm_position = arm_position + pi/8;
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        case IDARM_DOWN:
+            MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
+            for (int i = 1; i <= 64; i++) {
+                arm_position = arm_position + pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                break;
-            case IDARM_UP:
-                MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
-                arm_position = arm_position - pi / 8;
-                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                break;
-            case IDHAND_DOWN:
-                MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
-                hand_position = hand_position + pi/8;
-                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                break;
-            case IDHAND_UP:
-                MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
-                hand_position = hand_position - pi/8;
-                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
+                Sleep(10);
             }
+            break;
+        case IDARM_UP:
+            MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
+            for (int i = 1; i <= 64; i++) {
+                arm_position = arm_position - pi / 512;
+                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                Sleep(10);
+            }
+            break;
+        case IDHAND_DOWN:
+            MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
+            for (int i = 1; i <= 64; i++) {
+                hand_position = hand_position - pi / 512;
+                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                Sleep(10);
+            }
+            break;
+        case IDHAND_UP:
+            MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
+            for (int i = 1; i <= 64; i++) {
+                hand_position = hand_position + pi / 512;
+                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                Sleep(10);
+            }
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
         }
-        break;
+    }
+    break;
     case WM_PAINT:
-        {
-            hdc = BeginPaint(hWnd, &ps);
-            // TODO: Tutaj dodaj kod rysujący używający elementu hdc...
-            repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-            EndPaint(hWnd, &ps);
-        }
-        break;
+    {
+        hdc = BeginPaint(hWnd, &ps);
+        // TODO: Tutaj dodaj kod rysujący używający elementu hdc...
+        repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -250,7 +262,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 // funkcje do przeniesiena do innego cpp
 
-void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float &arm_position, float &hand_position)
+void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position)
 {
     if (drawArea == NULL)
         InvalidateRect(hWnd, NULL, TRUE); // repaint all
@@ -261,7 +273,7 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float &
     EndPaint(hWnd, &ps);
 }
 
-VOID OnPaint(HDC hdc, float &arm_position,float &hand_position)
+VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
 {
     int hook_x = 300;
     int hook_y = 400;
@@ -290,7 +302,7 @@ VOID OnPaint(HDC hdc, float &arm_position,float &hand_position)
     graphics.DrawRectangles(&blackPen, pRects, 5);
     graphics.FillRectangles(&greenBrush, rects, 5);
 
-     graphics.DrawLine(&blackPen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
-     graphics.DrawLine(&blackPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
+    graphics.DrawLine(&blackPen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
+    graphics.DrawLine(&blackPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
 }
 
