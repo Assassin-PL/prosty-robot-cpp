@@ -12,8 +12,8 @@ using namespace Gdiplus;
 #define MAX_LOADSTRING 100
 
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
-void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float arm_position, float hand_position);
-VOID OnPaint(HDC hdc, float arm_position, float hand_position);
+void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float &arm_position, float &hand_position);
+VOID OnPaint(HDC hdc, float &arm_position, float &hand_position);
 //koniec
 HWND arm_down, arm_up, hand_down, hand_up; //arm to ramie dolne a up to ramie gorne
 
@@ -22,6 +22,9 @@ HINSTANCE hInst;                                // bieżące wystąpienie
 WCHAR szTitle[MAX_LOADSTRING];                  // Tekst paska tytułu
 WCHAR szWindowClass[MAX_LOADSTRING];            // nazwa klasy okna głównego
 int timer = 0;
+const double pi = 3.1415926535897932384626433832795;
+float arm_position = 0;
+float hand_position = 0;
 
 // Przekaż dalej deklaracje funkcji dołączone w tym module kodu:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -144,9 +147,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
-    const double pi = 3.1415926535897932384626433832795;
-    float arm_position = pi;
-    float hand_position = pi;
     switch (message)
     {
     case WM_CREATE:
@@ -172,7 +172,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
         break;
     case WM_TIMER:
-        repaintWindow(hWnd, hdc, ps , NULL,0,0);
+        repaintWindow(hWnd, hdc, ps , NULL, arm_position, hand_position);
         timer++;
         break;
     case WM_COMMAND:
@@ -189,22 +189,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case IDARM_DOWN:
                 MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
-                arm_position = arm_position - pi/8;
+                arm_position = arm_position + pi/8;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 break;
             case IDARM_UP:
                 MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
-                arm_position = arm_position + pi / 8;
+                arm_position = arm_position - pi / 8;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 break;
             case IDHAND_DOWN:
                 MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
-                hand_position = hand_position - pi/8;
+                hand_position = hand_position + pi/8;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 break;
             case IDHAND_UP:
                 MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
-                hand_position = hand_position + pi/8;
+                hand_position = hand_position - pi/8;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 break;
             default:
@@ -250,7 +250,7 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 // funkcje do przeniesiena do innego cpp
 
-void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float arm_position, float hand_position)
+void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float &arm_position, float &hand_position)
 {
     if (drawArea == NULL)
         InvalidateRect(hWnd, NULL, TRUE); // repaint all
@@ -261,7 +261,7 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float a
     EndPaint(hWnd, &ps);
 }
 
-VOID OnPaint(HDC hdc, float arm_position,float hand_position)
+VOID OnPaint(HDC hdc, float &arm_position,float &hand_position)
 {
     int hook_x = 300;
     int hook_y = 400;
@@ -270,8 +270,8 @@ VOID OnPaint(HDC hdc, float arm_position,float hand_position)
     int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
     arm_position_x = arm_length * cos(arm_position) + hook_x;
     arm_position_y = arm_length * sin(arm_position) + hook_y;
-    hand_position_x = hand_length * cos(hand_position) + arm_position_x;
-    hand_position_y = hand_length * sin(hand_position) + arm_position_y;
+    hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
+    hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
     Graphics graphics(hdc);
     // Create a Pen object.
     Pen blackPen(Color(255, 0, 0, 0), 3);
