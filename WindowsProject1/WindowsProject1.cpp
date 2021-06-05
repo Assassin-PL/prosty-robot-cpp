@@ -1,6 +1,4 @@
 // WindowsProject1.cpp : Definiuje punkt wejścia dla aplikacji.
-//
-
 #include "framework.h"
 #include "WindowsProject1.h"
 #pragma comment (lib,"Gdiplus.lib")
@@ -8,9 +6,25 @@
 using namespace std;
 using namespace Gdiplus;
 
-
 #define MAX_LOADSTRING 100
+//klasa
+class Object
+{
+public:
+    Object();
+    ~Object();
 
+private:
+
+};
+
+Object::Object()
+{
+}
+
+Object::~Object()
+{
+}
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
@@ -188,35 +202,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             DestroyWindow(hWnd);
             break;
         case IDARM_DOWN:
-            MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
+            //MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
                 arm_position = arm_position + pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                Sleep(10);
+                Sleep(16.66666666666);
             }
             break;
         case IDARM_UP:
-            MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
+            //MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
                 arm_position = arm_position - pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                Sleep(10);
+                Sleep(16.66666666666);
             }
             break;
         case IDHAND_DOWN:
-            MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
+            //MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
                 hand_position = hand_position - pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                Sleep(10);
+                Sleep(16.66666666666);
             }
             break;
         case IDHAND_UP:
-            MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
+            //MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
                 hand_position = hand_position + pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                Sleep(10);
+                Sleep(16.6666666666);
             }
             break;
         default:
@@ -290,11 +304,11 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     SolidBrush greenBrush(Color(255, 0, 200, 50));
 
     // Create an array of Rect objects.
-    Rect rect1(350, 350, 10, 100);
-    Rect rect2(400, 300, 10, 150);
-    Rect rect3(450, 250, 10, 200);
-    Rect rect4(500, 400, 10, 50);
-    Rect rect5(550, 200, 10, 250);
+    Rect rect1(450, hook_y - 25, 25, 25);
+    Rect rect2(500, hook_y - 25, 25, 25);
+    Rect rect3(550, hook_y - 25, 25, 25);
+    Rect rect4(600, hook_y - 25, 25, 25);
+    Rect rect5(650, hook_y - 25, 25, 25);
 
     Rect rects[] = { rect1, rect2, rect3, rect4, rect5 };
     Rect* pRects = rects;
@@ -302,7 +316,12 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.DrawRectangles(&blackPen, pRects, 5);
     graphics.FillRectangles(&greenBrush, rects, 5);
 
+    graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y );
     graphics.DrawLine(&blackPen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
     graphics.DrawLine(&blackPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
 }
-
+// klasa obiekt
+// 1. musi wykrywac kolizje
+// 2. musi spadac (czy jest kontakt z podłożem czy nie)
+// 3. musi wykryc czy jest sie chwyconym
+// 4.  
