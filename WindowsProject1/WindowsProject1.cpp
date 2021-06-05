@@ -317,6 +317,8 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     Graphics graphics(hdc);
     // Create a Pen object.
     Pen blackPen(Color(255, 0, 0, 0), 3);
+    Pen bluePen(Color(255, 21, 235, 220), 3);
+    Pen redPen(Color(255, 245, 99, 66), 3);
     SolidBrush greenBrush(Color(255, 0, 200, 50));
 
     // Create an array of Rect objects.
@@ -334,8 +336,8 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.FillRectangles(&greenBrush, rects, 6);
 
     graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y );
-    graphics.DrawLine(&blackPen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
-    graphics.DrawLine(&blackPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
+    graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
+    graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
 }
 // klasa obiekt
 // 1. musi wykrywac kolizje
