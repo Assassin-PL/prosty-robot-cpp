@@ -59,6 +59,7 @@ const int hook_x = 300;
 const int hook_y = 400;
 const int arm_length = 100;
 const int hand_length = 100;
+// inicjalizowanie listy obiektow
 list <Object> object;
 // Przekaż dalej deklaracje funkcji dołączone w tym module kodu:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -232,6 +233,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position = arm_position + pi / 512;
                 if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi||hand_position_y>=hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    arm_position = arm_position - pi / 512;
                     break;
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
@@ -249,6 +251,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position = arm_position - pi / 512;
                 if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi || hand_position_y >= hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    arm_position = arm_position + pi / 512;
                     break;
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
@@ -266,6 +269,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 hand_position = hand_position - pi / 512;
                 if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y >= hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    hand_position = hand_position + pi / 512;
                     break;
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
@@ -283,6 +287,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 hand_position = hand_position + pi / 512;
                 if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y >= hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    hand_position = hand_position - pi / 512;
                     break;
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
