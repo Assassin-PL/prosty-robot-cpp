@@ -16,3 +16,4 @@
 #include <objidl.h>
 #include <gdiplus.h>
 #include <cmath>
+#include <list>

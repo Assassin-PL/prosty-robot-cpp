@@ -7,24 +7,37 @@ using namespace std;
 using namespace Gdiplus;
 
 #define MAX_LOADSTRING 100
-//klasa
+//klasay
 class Object
 {
 public:
-    Object();
+    bool is_hold;//czy jest trzymany ten obiekt
+    bool is_falling;// czy spada
+    bool is_collison;//czy jest wykryta kolizja z innym obiektem z listy obiektów
+    bool is_attached;// czy styka się z podłożem
+    int x, y;//koordynaty punktu zacczepienia obniektu
+    Object(bool a, bool b, bool c, bool d, int e, int f);
     ~Object();
 
 private:
 
 };
 
-Object::Object()
+Object::Object(bool a, bool b, bool c, bool d, int e, int f)
 {
+    is_hold = a;
+    is_falling = b;
+    is_collison = c;
+    is_attached = d;
+    x = e;
+    y = f;
 }
 
 Object::~Object()
 {
+
 }
+
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
@@ -39,6 +52,7 @@ int timer = 0;
 const double pi = 3.1415926535897932384626433832795;
 float arm_position = 0;
 float hand_position = 0;
+list <Object> object;
 
 // Przekaż dalej deklaracje funkcji dołączone w tym module kodu:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -289,6 +303,8 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
 
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
 {
+    const int free_space = 50;
+    const int length = 25;
     int hook_x = 300;
     int hook_y = 400;
     int arm_length = 100;
@@ -304,17 +320,18 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     SolidBrush greenBrush(Color(255, 0, 200, 50));
 
     // Create an array of Rect objects.
-    Rect rect1(450, hook_y - 25, 25, 25);
-    Rect rect2(500, hook_y - 25, 25, 25);
-    Rect rect3(550, hook_y - 25, 25, 25);
-    Rect rect4(600, hook_y - 25, 25, 25);
-    Rect rect5(650, hook_y - 25, 25, 25);
+    Rect rect1((hook_x + (2 * free_space) - 1), hook_y - length, length, length);
+    Rect rect2((hook_x + (3 * free_space) - 1), hook_y - length, length, length);
+    Rect rect3((hook_x + (4 * free_space) - 1), hook_y - length, length, length);
+    Rect rect4((hook_x - (2 * free_space) - 1), hook_y - length, length, length);
+    Rect rect5((hook_x - (3 * free_space) - 1), hook_y - length, length, length);
+    Rect rect6((hook_x - (4 * free_space) - 1), hook_y - length, length, length);
 
-    Rect rects[] = { rect1, rect2, rect3, rect4, rect5 };
+    Rect rects[] = { rect1, rect2, rect3, rect4, rect5, rect6 };
     Rect* pRects = rects;
     // Draw the rectangles.
-    graphics.DrawRectangles(&blackPen, pRects, 5);
-    graphics.FillRectangles(&greenBrush, rects, 5);
+    graphics.DrawRectangles(&blackPen, pRects, 6);
+    graphics.FillRectangles(&greenBrush, rects, 6);
 
     graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y );
     graphics.DrawLine(&blackPen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
