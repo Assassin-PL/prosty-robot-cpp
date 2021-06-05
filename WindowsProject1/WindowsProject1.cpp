@@ -52,8 +52,14 @@ int timer = 0;
 const double pi = 3.1415926535897932384626433832795;
 float arm_position = 0;
 float hand_position = 0;
+// Zmienne określające rysowanie
+const int free_space = 50;
+const int length = 25;
+const int hook_x = 300;
+const int hook_y = 400;
+const int arm_length = 100;
+const int hand_length = 100;
 list <Object> object;
-
 // Przekaż dalej deklaracje funkcji dołączone w tym module kodu:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -218,8 +224,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDARM_DOWN:
             //MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
+                int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
+                arm_position_x = arm_length * cos(arm_position) + hook_x;
+                arm_position_y = arm_length * sin(arm_position) + hook_y;
+                hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
+                hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
                 arm_position = arm_position + pi / 512;
-                if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi) {
+                if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi||hand_position_y>=hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     break;
                 }
@@ -230,8 +241,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDARM_UP:
             //MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
+                int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
+                arm_position_x = arm_length * cos(arm_position) + hook_x;
+                arm_position_y = arm_length * sin(arm_position) + hook_y;
+                hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
+                hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
                 arm_position = arm_position - pi / 512;
-                if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi) {
+                if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi || hand_position_y >= hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     break;
                 }
@@ -242,7 +258,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDHAND_DOWN:
             //MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
+                int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
+                arm_position_x = arm_length * cos(arm_position) + hook_x;
+                arm_position_y = arm_length * sin(arm_position) + hook_y;
+                hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
+                hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
                 hand_position = hand_position - pi / 512;
+                if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y >= hook_y) {
+                    MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    break;
+                }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -250,7 +275,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDHAND_UP:
             //MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
+                int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
+                arm_position_x = arm_length * cos(arm_position) + hook_x;
+                arm_position_y = arm_length * sin(arm_position) + hook_y;
+                hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
+                hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
                 hand_position = hand_position + pi / 512;
+                if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y >= hook_y) {
+                    MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    break;
+                }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.6666666666);
             }
@@ -311,12 +345,6 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
 
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
 {
-    const int free_space = 50;
-    const int length = 25;
-    int hook_x = 300;
-    int hook_y = 400;
-    int arm_length = 100;
-    int hand_length = 100;
     int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
     arm_position_x = arm_length * cos(arm_position) + hook_x;
     arm_position_y = arm_length * sin(arm_position) + hook_y;
@@ -347,7 +375,7 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
     graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
     //robienie listy
-    int size_of_table = sizeof(rects);
+    int size_of_table = 6;
     for (int i = 0; i < size_of_table; i++)
     {
         Object obj1(0 ,0 ,0 ,1,rects[i].X, rects[i].Y);
