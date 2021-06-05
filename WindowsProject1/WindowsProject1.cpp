@@ -334,10 +334,16 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     // Draw the rectangles.
     graphics.DrawRectangles(&blackPen, pRects, 6);
     graphics.FillRectangles(&greenBrush, rects, 6);
-
+    // rysowanie reki
     graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y );
     graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
     graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
+    //robienie listy
+    for (int i = 0; i < 6; i++)
+    {
+        Object obj1(0 ,0 ,0 ,1,rects[i].X, rects[i].Y);
+        object.push_back(obj1);
+    }
 }
 // klasa obiekt
 // 1. musi wykrywac kolizje
