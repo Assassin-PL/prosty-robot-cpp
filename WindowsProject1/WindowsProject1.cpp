@@ -219,6 +219,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
                 arm_position = arm_position + pi / 512;
+                if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi) {
+                    MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    break;
+                }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -227,6 +231,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
                 arm_position = arm_position - pi / 512;
+                if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi) {
+                    MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    break;
+                }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
