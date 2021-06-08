@@ -11,26 +11,23 @@ using namespace Gdiplus;
 class Object
 {
 public:
+    Rect rectangle; //dodaje klocka i chuj
     bool is_hold;//czy jest trzymany ten obiekt
     bool is_falling;// czy spada
     bool is_collison;//czy jest wykryta kolizja z innym obiektem z listy obiektów
     bool is_attached;// czy styka się z podłożem
     int x, y;//koordynaty punktu zacczepienia obniektu
-    Object(bool a, bool b, bool c, bool d, int e, int f);
+    Object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa);
     ~Object();
+    void set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa);
 
 private:
 
 };
 
-Object::Object(bool a, bool b, bool c, bool d, int e, int f)
+Object::Object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
 {
-    is_hold = a;
-    is_falling = b;
-    is_collison = c;
-    is_attached = d;
-    x = e;
-    y = f;
+    set_object(a, b, c, d, e, f, dupa);
 }
 
 Object::~Object()
@@ -38,11 +35,25 @@ Object::~Object()
 
 }
 
+void Object::set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
+{
+    is_hold = a;
+    is_falling = b;
+    is_collison = c;
+    is_attached = d;
+    x = e;
+    y = f;
+    rectangle = dupa;
+}
+
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
+void which_is_hold(int x, int y);
+list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y);
+
 //koniec
-HWND arm_down, arm_up, hand_down, hand_up; //arm to ramie dolne a up to ramie gorne
+HWND arm_down, arm_up, hand_down, hand_up, hold, drop; //arm to ramie dolne a up to ramie gorne
 
 // Zmienne globalne:
 HINSTANCE hInst;                                // bieżące wystąpienie
@@ -52,6 +63,7 @@ int timer = 0;
 const double pi = 3.1415926535897932384626433832795;
 float arm_position = 0;
 float hand_position = 0;
+bool holding = false;
 // Zmienne określające rysowanie
 const int free_space = 50;
 const int length = 25;
@@ -185,6 +197,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_CREATE:
+        hold = CreateWindow(TEXT("button"), TEXT("Zlap lapa"),
+            WS_VISIBLE | WS_CHILD,
+            280, 100, 240, 25,
+            hWnd, (HMENU)IDHOLD, NULL, NULL);
+
+        drop = CreateWindow(TEXT("button"), TEXT("upusc lapa"),
+            WS_VISIBLE | WS_CHILD,
+            540, 100, 240, 25,
+            hWnd, (HMENU)IDDROP, NULL, NULL);
+
         arm_down = CreateWindow(TEXT("button"), TEXT("Ramie dolne w prawo"),
             WS_VISIBLE | WS_CHILD,
             20, 50, 240, 25,
@@ -222,8 +244,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_EXIT:
             DestroyWindow(hWnd);
             break;
+        case IDHOLD:
+            MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
+            holding = true;
+            break;
+        case IDDROP:
+            MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
+            holding = false;
+            break;
         case IDARM_DOWN:
-            //MessageBox(NULL, TEXT("button_one_clicked"), TEXT("mleko"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
@@ -241,7 +270,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             break;
         case IDARM_UP:
-            //MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 64; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
@@ -369,8 +397,28 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     Rect rect4((hook_x - (2 * free_space) - 1), hook_y - length, length, length);
     Rect rect5((hook_x - (3 * free_space) - 1), hook_y - length, length, length);
     Rect rect6((hook_x - (4 * free_space) - 1), hook_y - length, length, length);
-
-    Rect rects[] = { rect1, rect2, rect3, rect4, rect5, rect6 };
+    //robienie listy
+    Object obj1(0, 0, 0, 1, (hook_x + (2 * free_space) - 1), hook_y - length, rect1);
+    object.push_back(obj1);
+    obj1.set_object(0, 0, 0, 1, (hook_x + (3 * free_space) - 1), hook_y - length, rect2);
+    object.push_back(obj1);
+    obj1.set_object(0, 0, 0, 1, (hook_x + (4 * free_space) - 1), hook_y - length, rect3);
+    object.push_back(obj1);
+    obj1.set_object(0, 0, 0, 1, (hook_x - (2 * free_space) - 1), hook_y - length, rect4);
+    object.push_back(obj1);
+    obj1.set_object(0, 0, 0, 1, (hook_x - (3 * free_space) - 1), hook_y - length, rect5);
+    object.push_back(obj1);
+    obj1.set_object(0, 0, 0, 1, (hook_x - (4 * free_space) - 1), hook_y - length, rect6);
+    object.push_back(obj1);
+    //wypelnianie tablicy
+    Rect rects[] = {
+        get_itterator_of_object(object,(hook_x + (2 * free_space) - 1), hook_y - length)->rectangle,
+        get_itterator_of_object(object,(hook_x + (3 * free_space) - 1), hook_y - length)->rectangle,
+        get_itterator_of_object(object,(hook_x + (4 * free_space) - 1), hook_y - length)->rectangle,
+        get_itterator_of_object(object,(hook_x - (2 * free_space) - 1), hook_y - length)->rectangle,
+        get_itterator_of_object(object,(hook_x - (3 * free_space) - 1), hook_y - length)->rectangle,
+        get_itterator_of_object(object,(hook_x - (4 * free_space) - 1), hook_y - length)->rectangle,
+    };
     Rect* pRects = rects;
     // Draw the rectangles.
     graphics.DrawRectangles(&blackPen, pRects, 6);
@@ -379,12 +427,39 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y );
     graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
     graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
-    //robienie listy
-    int size_of_table = 6;
-    for (int i = 0; i < size_of_table; i++)
+    if (holding == 1)
     {
-        Object obj1(0 ,0 ,0 ,1,rects[i].X, rects[i].Y);
-        object.push_back(obj1);
+        //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+    }
+}
+
+void which_is_hold(int x, int y)
+{
+    Rect cycki(x, y, length, length);
+    list<Object>::iterator wsk_object;
+    wsk_object = get_itterator_of_object_in_area(object, x, y);
+    wsk_object->rectangle = cycki;
+}
+
+list<Object>::iterator get_itterator_of_object(list<Object>& object, int x,int y)
+{
+    for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+    {
+        if (i->x == x&& i->y == y)
+        {
+            return i;
+        }
+    }
+}
+
+list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int x, int y)
+{
+    for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+    {
+        if (x>=(i->x)&&x<=(i->x-length)&& y >= (i->y) && y <= (i->y - length))
+        {
+            return i;
+        }
     }
 }
 // klasa obiekt

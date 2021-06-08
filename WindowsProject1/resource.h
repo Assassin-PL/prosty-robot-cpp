@@ -13,6 +13,8 @@
 #define IDI_SMALL                       108
 #define IDC_WINDOWSPROJECT1             109
 #define IDR_MAINFRAME                   128
+#define IDHOLD                          254
+#define IDDROP                          255
 #define IDARM_DOWN                      256
 #define IDARM_UP                        257
 #define IDHAND_DOWN                     258
