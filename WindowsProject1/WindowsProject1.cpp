@@ -259,12 +259,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                arm_position = arm_position + pi / 512;
-                if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi||hand_position_y>=hook_y) {
+                
+                if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     arm_position = arm_position - pi / 512;
                     break;
                 }
+                arm_position = arm_position + pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -276,12 +277,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                arm_position = arm_position - pi / 512;
-                if ((arm_position>0 && arm_position<pi)||arm_position<-pi&&arm_position>-2*pi || hand_position_y >= hook_y) {
+                if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     arm_position = arm_position + pi / 512;
                     break;
                 }
+                arm_position = arm_position - pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -294,12 +295,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                hand_position = hand_position - pi / 512;
-                if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y >= hook_y) {
+                
+                if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
-                    hand_position = hand_position + pi / 512;
                     break;
                 }
+                hand_position = hand_position - pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -312,12 +313,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                hand_position = hand_position + pi / 512;
-                if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y >= hook_y) {
+                
+                if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
-                    hand_position = hand_position - pi / 512;
                     break;
                 }
+                hand_position = hand_position + pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.6666666666);
             }
@@ -424,7 +425,7 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.DrawRectangles(&blackPen, pRects, 6);
     graphics.FillRectangles(&greenBrush, rects, 6);
     // rysowanie reki
-    graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y );
+    graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y);
     graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
     graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
     if (holding == 1)
