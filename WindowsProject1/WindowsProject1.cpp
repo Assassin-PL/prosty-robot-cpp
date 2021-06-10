@@ -51,6 +51,7 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
 void which_is_hold(int x, int y);
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y);
+bool is_in_area_of_object(list<Object>& object, int x, int y);
 
 //koniec
 HWND arm_down, arm_up, hand_down, hand_up, hold, drop; //arm to ramie dolne a up to ramie gorne
@@ -428,9 +429,10 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y);
     graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
     graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
-    if (holding == 1)
+    if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
     {
-        //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+        MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+        //which_is_hold(hand_position_x, hand_position_y);
     }
 }
 
@@ -438,10 +440,10 @@ void which_is_hold(int x, int y)
 {
     Rect cycki(x, y, length, length);
     list<Object>::iterator wsk_object;
-    wsk_object = get_itterator_of_object_in_area(object, x, y);
+    wsk_object = get_itterator_of_object(object, x, y);
     wsk_object->rectangle = cycki;
 }
-
+ 
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x,int y)
 {
     for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
@@ -457,9 +459,20 @@ list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int
 {
     for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
     {
-        if (x>=(i->x)&&x<=(i->x-length)&& y >= (i->y) && y <= (i->y - length))
+        if (x>=(i->x)&&x<=(i->x+length)&& y <= (i->y) && y >= (i->y + length))
         {
             return i;
+        }
+    }
+}
+
+bool is_in_area_of_object(list<Object>& object, int x, int y)
+{
+    for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+    {
+        if (x >= (i->x) && x <= (i->x + length) && y <= (i->y) && y >= (i->y + length))
+        {
+            return true;
         }
     }
 }
