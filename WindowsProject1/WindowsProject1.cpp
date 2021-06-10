@@ -260,7 +260,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                
+
                 if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     arm_position = arm_position - pi / 512;
@@ -296,9 +296,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                
+
                 if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    hand_position = hand_position + pi / 512;
                     break;
                 }
                 hand_position = hand_position - pi / 512;
@@ -314,9 +315,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                
+
                 if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    hand_position = hand_position - pi / 512;
                     break;
                 }
                 hand_position = hand_position + pi / 512;
@@ -443,12 +445,12 @@ void which_is_hold(int x, int y)
     wsk_object = get_itterator_of_object(object, x, y);
     wsk_object->rectangle = cycki;
 }
- 
-list<Object>::iterator get_itterator_of_object(list<Object>& object, int x,int y)
+
+list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y)
 {
     for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
     {
-        if (i->x == x&& i->y == y)
+        if (i->x == x && i->y == y)
         {
             return i;
         }
@@ -459,7 +461,7 @@ list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int
 {
     for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
     {
-        if (x>=(i->x)&&x<=(i->x+length)&& y <= (i->y) && y >= (i->y + length))
+        if (x >= (i->x) && x <= (i->x + length) && y <= (i->y) && y >= (i->y + length))
         {
             return i;
         }
