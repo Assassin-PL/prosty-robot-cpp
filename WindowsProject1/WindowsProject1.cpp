@@ -49,7 +49,7 @@ void Object::set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
-void which_is_hold(int x, int y);
+void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y,int dx, int dy);
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y);
 bool is_in_area_of_object(list<Object>& object, int x, int y);
 
@@ -268,6 +268,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
                 arm_position = arm_position + pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
+                {
+                    int dx, dy;
+                    dx = hand_length * cos(hand_position + arm_position) + arm_position_x - hand_length * cos(hand_position + arm_position - pi / 512) + arm_position_x;
+                    dy = hand_length * cos(hand_position + arm_position) + arm_position_x - hand_length * cos(hand_position + arm_position - pi / 512) + arm_position_y;
+                    MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+                    //which_is_hold(hWnd, hdc, ps, NULL,arm_position,hand_position,hand_position_x, hand_position_y, dx, dy);
+                }
+                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
             break;
@@ -284,6 +293,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
                 arm_position = arm_position - pi / 512;
+                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
+                {
+                    int dx, dy;
+                    dx = hand_length * cos(hand_position + arm_position) + arm_position_x - hand_length * cos(hand_position + arm_position + pi / 512) + arm_position_x;
+                    dy = hand_length * cos(hand_position + arm_position) + arm_position_x - hand_length * cos(hand_position + arm_position + pi / 512) + arm_position_y;
+                    MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+                    //which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
+                }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -304,6 +322,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 }
                 hand_position = hand_position - pi / 512;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
+                {
+                    int dx, dy;
+                    dx = hand_length * cos(hand_position + arm_position) + arm_position_x - hand_length * cos(hand_position + arm_position + pi / 512) + arm_position_x;
+                    dy = hand_length * cos(hand_position + arm_position) + arm_position_x - hand_length * cos(hand_position + arm_position + pi / 512) + arm_position_y;
+                    MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+                    //which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
+                }
+                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
             break;
@@ -322,6 +349,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
                 hand_position = hand_position + pi / 512;
+                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
+                {
+                    int dx, dy;
+                    dx = hand_length * cos(hand_position + arm_position) + arm_position_x - hand_length * cos(hand_position + arm_position - pi / 512) + arm_position_x;
+                    dy = hand_length * cos(hand_position + arm_position) + arm_position_x - hand_length * cos(hand_position + arm_position - pi / 512) + arm_position_y;
+                    MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+                    //which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
+                }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.6666666666);
             }
@@ -431,18 +467,13 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y);
     graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
     graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
-    if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
-    {
-        MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
-        //which_is_hold(hand_position_x, hand_position_y);
-    }
 }
 
-void which_is_hold(int x, int y)
+void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position,int x, int y,int dx, int dy)
 {
-    Rect cycki(x, y, length, length);
     list<Object>::iterator wsk_object;
     wsk_object = get_itterator_of_object(object, x, y);
+    Rect cycki(wsk_object->x+dx, wsk_object->y+dy, length, length);
     wsk_object->rectangle = cycki;
 }
 
@@ -461,7 +492,7 @@ list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int
 {
     for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
     {
-        if (x >= (i->x) && x <= (i->x + length) && y <= (i->y) && y >= (i->y + length))
+        if (x >= (i->x) && x <= (i->x + length) && y >= (i->y) && y <= (i->y + length))
         {
             return i;
         }
@@ -472,7 +503,7 @@ bool is_in_area_of_object(list<Object>& object, int x, int y)
 {
     for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
     {
-        if (x >= (i->x) && x <= (i->x + length) && y <= (i->y) && y >= (i->y + length))
+        if (x >= (i->x) && x <= (i->x + length) && y >= (i->y) && y <= (i->y + length))
         {
             return true;
         }
