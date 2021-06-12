@@ -512,12 +512,12 @@ VOID PAINT_RECTS(HDC hdc)
 
 void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy)
 {
-    MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
     list<Object>::iterator wsk_object;
     wsk_object = get_itterator_of_object_in_area(object, x, y);
-    Rect cycki(wsk_object->x + dx, wsk_object->y + dy, length, length);
+    Rect cycki(wsk_object->x + dx, wsk_object->y - dy ,length, length);
     wsk_object->x = wsk_object->x + dx;
-    wsk_object->y = wsk_object->y + dy;
+    wsk_object->y = wsk_object->y - dy;
     wsk_object->rectangle = cycki;
 }
 
