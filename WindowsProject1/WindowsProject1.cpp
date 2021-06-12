@@ -257,6 +257,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDARM_DOWN:
             for (int i = 1; i <= 64; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
+                int hand_position_x_previous, hand_position_y_previous;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
@@ -268,15 +269,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
                 arm_position = arm_position + pi / 512;
-                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
-                    dx = hand_length * cos(hand_position + arm_position) - hand_length * cos(hand_position + arm_position - pi / 512);
-                    dy = hand_length * cos(hand_position + arm_position) - hand_length * cos(hand_position + arm_position - pi / 512);
+                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
+                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
-                    which_is_hold(hWnd, hdc, ps, NULL,arm_position,hand_position,hand_position_x, hand_position_y, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
+                hand_position_x_previous = hand_position_x;
+                hand_position_y_previous= hand_position_y;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -284,6 +287,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDARM_UP:
             for (int i = 1; i <= 64; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
+                //int hand_position_x_previous, hand_position_y_previous;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
@@ -294,15 +298,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
                 arm_position = arm_position - pi / 512;
-                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
-                    dx = hand_length * cos(hand_position + arm_position) - hand_length * cos(hand_position + arm_position + pi / 512);
-                    dy = hand_length * cos(hand_position + arm_position) - hand_length * cos(hand_position + arm_position + pi / 512);
+                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
+                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
+                //hand_position_x_previous = hand_position_x;
+                //hand_position_y_previous = hand_position_y;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -315,19 +321,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-
+                
                 if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     hand_position = hand_position + pi / 512;
                     break;
                 }
                 hand_position = hand_position - pi / 512;
-                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
-                    dx = hand_length * (cos(hand_position + arm_position) - cos(hand_position + arm_position + pi / 512));
-                    dy = hand_length * cos(hand_position + arm_position) - hand_length * cos(hand_position + arm_position + pi / 512);
+                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
+                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
@@ -343,19 +349,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-
+                
                 if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     hand_position = hand_position - pi / 512;
                     break;
                 }
                 hand_position = hand_position + pi / 512;
-                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
-                    dx = hand_length * cos(hand_position + arm_position) - hand_length * cos(hand_position + arm_position - pi / 512);
-                    dy = hand_length * cos(hand_position + arm_position) - hand_length * cos(hand_position + arm_position - pi / 512);
+                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
+                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
