@@ -49,8 +49,9 @@ void Object::set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
-void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y,int dx, int dy);
+void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy);
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y);
+list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int x, int y);
 bool is_in_area_of_object(list<Object>& object, int x, int y);
 
 //koniec
@@ -469,11 +470,11 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
 }
 
-void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position,int x, int y,int dx, int dy)
+void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy)
 {
     list<Object>::iterator wsk_object;
-    wsk_object = get_itterator_of_object(object, x, y);
-    Rect cycki(wsk_object->x+dx, wsk_object->y+dy, length, length);
+    wsk_object = get_itterator_of_object_in_area(object, x, y);
+    Rect cycki(wsk_object->x + dx, wsk_object->y + dy, length, length);
     wsk_object->rectangle = cycki;
 }
 
