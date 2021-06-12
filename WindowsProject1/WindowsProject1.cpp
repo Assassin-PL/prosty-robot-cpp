@@ -48,7 +48,9 @@ void Object::set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
 
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
+void repaintRects(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
+VOID PAINT_RECTS(HDC hdc);
 void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy);
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y);
 list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int x, int y);
@@ -378,6 +380,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         hdc = BeginPaint(hWnd, &ps);
         // TODO: Tutaj dodaj kod rysujący używający elementu hdc...
+        repaintRects(hWnd, hdc, ps, NULL);
         repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
         EndPaint(hWnd, &ps);
     }
@@ -423,6 +426,17 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
     EndPaint(hWnd, &ps);
 }
 
+void repaintRects(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea)
+{
+    if (drawArea == NULL)
+        InvalidateRect(hWnd, NULL, TRUE); // repaint all
+    else
+        InvalidateRect(hWnd, drawArea, TRUE); //repaint drawArea
+    hdc = BeginPaint(hWnd, &ps);
+    PAINT_RECTS(hdc);
+    EndPaint(hWnd, &ps);
+}
+
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
 {
     int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
@@ -436,7 +450,31 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     Pen bluePen(Color(255, 21, 235, 220), 3);
     Pen redPen(Color(255, 245, 99, 66), 3);
     SolidBrush greenBrush(Color(255, 0, 200, 50));
+    list<Object>::iterator j = object.begin();
+    Rect rects[6];
+    for (int i = 0; i < 6; i++)
+    {
+        rects[i] = get_itterator_of_object(object,j->x,j->y)->rectangle;
+        j++;
+    }
+    Rect* pRects = rects;
+    // Draw the rectangles.
+    graphics.DrawRectangles(&blackPen, pRects, 6);
+    graphics.FillRectangles(&greenBrush, rects, 6);
+    // rysowanie reki
+    graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y);
+    graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
+    graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
+}
 
+VOID PAINT_RECTS(HDC hdc)
+{
+    Graphics graphics(hdc);
+    // Create a Pen object.
+    Pen blackPen(Color(255, 0, 0, 0), 3);
+    Pen bluePen(Color(255, 21, 235, 220), 3);
+    Pen redPen(Color(255, 245, 99, 66), 3);
+    SolidBrush greenBrush(Color(255, 0, 200, 50));
     // Create an array of Rect objects.
     Rect rect1((hook_x + (2 * free_space) - 1), hook_y - length, length, length);
     Rect rect2((hook_x + (3 * free_space) - 1), hook_y - length, length, length);
@@ -457,7 +495,7 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     object.push_back(obj1);
     obj1.set_object(0, 0, 0, 1, (hook_x - (4 * free_space) - 1), hook_y - length, rect6);
     object.push_back(obj1);
-    //wypelnianie tablicy
+    //wypelnianie tablicy 
     Rect rects[] = {
         get_itterator_of_object(object,(hook_x + (2 * free_space) - 1), hook_y - length)->rectangle,
         get_itterator_of_object(object,(hook_x + (3 * free_space) - 1), hook_y - length)->rectangle,
@@ -470,17 +508,16 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     // Draw the rectangles.
     graphics.DrawRectangles(&blackPen, pRects, 6);
     graphics.FillRectangles(&greenBrush, rects, 6);
-    // rysowanie reki
-    graphics.DrawLine(&blackPen, 0, hook_y, 1920, hook_y);
-    graphics.DrawLine(&bluePen, hook_x, hook_y, arm_position_x, arm_position_y); //wyswqietlanie reki
-    graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
 }
 
 void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy)
 {
+    MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
     list<Object>::iterator wsk_object;
     wsk_object = get_itterator_of_object_in_area(object, x, y);
     Rect cycki(wsk_object->x + dx, wsk_object->y + dy, length, length);
+    wsk_object->x = wsk_object->x + dx;
+    wsk_object->y = wsk_object->y + dy;
     wsk_object->rectangle = cycki;
 }
 
