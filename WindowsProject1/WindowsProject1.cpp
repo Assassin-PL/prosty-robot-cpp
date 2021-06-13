@@ -76,7 +76,7 @@ void make_hold_oobject(int hand_position_x, int hand_position_y);
 void end_collision(list<Object>& object);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
 VOID PAINT_RECTS();
-void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int ddx, int ddy, int dx, int dy);
+void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int ddx, int ddy, int dx);
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y);
 list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int x, int y);
 list<Object>::iterator get_itterator_of_falling_object(list<Object>& object);
@@ -276,7 +276,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 list<Object>::iterator wsk_object;
                 wsk_object = get_itterator_of_falling_object(object);
-                while (is_fall(object) == true && is_attached(object) == false)
+                while (wsk_object->is_falling == true && wsk_object->is_attached == false)
                 {
                     make_collision(object);
                     wsk_object->y += 1;
@@ -318,12 +318,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
-                    int dx, dy;
+                    float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
@@ -344,12 +344,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position = arm_position - pi / 512;
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
-                    int dx, dy;
+                    float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
@@ -372,12 +372,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 hand_position = hand_position + pi / 512;
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
-                    int dx, dy;
+                    float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.6666666666);
@@ -399,12 +399,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 hand_position = hand_position - pi / 512;
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
-                    int dx, dy;
+                    float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
-                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    //dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
@@ -514,7 +514,7 @@ VOID PAINT_RECTS()
     //wypelnianie tablicy 
 }
 
-void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int ddx, int ddy, int dx, int dy)
+void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int ddx, int ddy, int dx)
 {
     int coordinate_x = x - ddx;
     int coordinate_y = y - ddy;
@@ -524,9 +524,10 @@ void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
     wsk_object->change_possition2(coordinate_x, coordinate_y, length, length);
     wsk_object->is_attached = false;
     wsk_object->is_falling = true;
-    if (is_collision(object) == true)
+    if (wsk_object->is_collison == true)
     {
-        wsk_object->change_possition(-2 * dx, -2 * dy, length, length);
+        if(dx>0) wsk_object->change_possition(-2, 2, length, length);
+        else wsk_object->change_possition(2, 2, length, length);
         holding = 0;
         end_collision(object);
     }
@@ -539,7 +540,7 @@ void falling(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_po
     wsk_object->change_possition(dx, dy, length, length);
     wsk_object->is_attached = false;
     wsk_object->is_falling = true;
-    if (is_collision(object) == true)
+    if (wsk_object->is_collison == true)
     {
         wsk_object->change_possition(-2 * dx, -2 * dy, length, length);
         holding = 0;
