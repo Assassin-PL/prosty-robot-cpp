@@ -17,9 +17,9 @@ public:
     bool is_collison;//czy jest wykryta kolizja z innym obiektem z listy obiektów
     bool is_attached;// czy styka się z podłożem
     int x, y;//koordynaty punktu zacczepienia obniektu
-    Object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa);
+    Object(bool a, bool b, bool c, bool d, int e, int f, Rect square);
     ~Object();
-    void set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa);
+    void set_object(bool a, bool b, bool c, bool d, int e, int f, Rect square);
     void fall(int width, int height);
     void change_possition(int dx, int dy, int width, int height);
     void change_possition2(int dx, int dy, int width, int height);
@@ -27,9 +27,9 @@ private:
 
 };
 
-Object::Object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
+Object::Object(bool a, bool b, bool c, bool d, int e, int f, Rect square)
 {
-    set_object(a, b, c, d, e, f, dupa);
+    set_object(a, b, c, d, e, f, square);
 }
 
 Object::~Object()
@@ -37,7 +37,7 @@ Object::~Object()
 
 }
 
-void Object::set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
+void Object::set_object(bool a, bool b, bool c, bool d, int e, int f, Rect square)
 {
     is_hold = a;
     is_falling = b;
@@ -45,29 +45,29 @@ void Object::set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
     is_attached = d;
     x = e;
     y = f;
-    rectangle = dupa;
+    rectangle = square;
 }
 void Object::fall(int width, int height)
 {
     x += 1;
     y += 1;
-    Rect dupa(x, y, width, height);
-    rectangle = dupa;
+    Rect square(x, y, width, height);
+    rectangle = square;
 }
 
 void Object::change_possition(int dx, int dy, int width, int height)
 {
     x = x + dx;
     y = y - dy;
-    Rect dupa(x, y, width, height);
-    rectangle = dupa;
+    Rect square(x, y, width, height);
+    rectangle = square;
 }
 void Object::change_possition2(int dx, int dy, int width, int height)
 {
     x = dx;
     y = dy;
-    Rect dupa(x, y, width, height);
-    rectangle = dupa;
+    Rect square(x, y, width, height);
+    rectangle = square;
 }
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
@@ -84,15 +84,15 @@ bool is_in_area_of_object(list<Object>& object, int x, int y);
 bool is_fall(list<Object>& object);
 bool is_collision(list<Object>& object);
 bool is_attached(list<Object>& object);
-//int algorytm_losujacy(int beg, int end);
+
 
 //koniec
 HWND arm_down, arm_up, hand_down, hand_up, hold, drop; //arm to ramie dolne a up to ramie gorne
 
-// Zmienne globalne:
-HINSTANCE hInst;                                // bieżące wystąpienie
-WCHAR szTitle[MAX_LOADSTRING];                  // Tekst paska tytułu
-WCHAR szWindowClass[MAX_LOADSTRING];            // nazwa klasy okna głównego
+
+HINSTANCE hInst;                               
+WCHAR szTitle[MAX_LOADSTRING];                  
+WCHAR szWindowClass[MAX_LOADSTRING];            
 int timer = 0;
 const double pi = 3.1415926535897932384626433832795;
 float arm_position = 0;
@@ -107,9 +107,9 @@ const int hook_x = 300;
 const int hook_y = 400;
 const int arm_length = 150;
 const int hand_length = 150;
-// inicjalizowanie listy obiektow
+
 list <Object> object;
-// Przekaż dalej deklaracje funkcji dołączone w tym module kodu:
+
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -123,18 +123,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-    // TODO: W tym miejscu umieść kod.
+
     GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR           gdiplusToken;
 
     GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-    // Inicjuj ciągi globalne
+
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_WINDOWSPROJECT1, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
     PAINT_RECTS();
 
-    // Wykonaj inicjowanie aplikacji:
+
     if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
@@ -146,7 +146,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    // Główna pętla komunikatów:
+ 
     while (GetMessage(&msg, nullptr, 0, 0))
     {
         if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -316,7 +316,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
                 arm_position = arm_position + pi / 512;
-                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     float dx, dy;
@@ -402,7 +401,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 {
                     float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
-                    //dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy, dx);
@@ -521,7 +519,6 @@ void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
     int coordinate_y = y - ddy;
     list<Object>::iterator wsk_object;
     wsk_object = get_itterator_of_object_in_area(object, x, y);
-    //wsk_object->change_possition(coordinate_x, coordinate_y, length, length);
     wsk_object->change_possition2(coordinate_x, coordinate_y, length, length);
     wsk_object->is_attached = false;
     wsk_object->is_falling = true;
