@@ -279,11 +279,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 while (wsk_object->is_falling == true && wsk_object->is_attached == false)
                 {
                     make_collision(object);
-                    wsk_object->y += 1;
                     wsk_object->change_possition(0, -1, length, length);
                     if (wsk_object->is_collison == true)
                     {
-                        wsk_object->y -= 2;
                         wsk_object->change_possition(0, 2, length, length);
                         wsk_object->is_attached = true;
                         end_collision(object);
@@ -292,7 +290,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     }
                     if ((wsk_object->y + length) == hook_y)
                     {
-                        wsk_object->y -= 1;
                         wsk_object->change_possition(0, 1, length, length);
                         wsk_object->is_attached = true;
                         break;
