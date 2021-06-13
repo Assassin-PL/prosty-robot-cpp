@@ -7,11 +7,11 @@ using namespace std;
 using namespace Gdiplus;
 
 #define MAX_LOADSTRING 100
-//klasay
+
 class Object
 {
 public:
-    Rect rectangle; //dodaje klocka i chuj
+    Rect rectangle; //dodaje klocka
     bool is_hold;//czy jest trzymany ten obiekt
     bool is_falling;// czy spada
     bool is_collison;//czy jest wykryta kolizja z innym obiektem z listy obiektów
@@ -63,7 +63,6 @@ void Object::change_possition(int dx, int dy, int width, int height)
 }
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
-void repaintRects(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea);
 void make_collision(list<Object>& object);
 void make_hold_oobject(int hand_position_x, int hand_position_y);
 void end_collision(list<Object>& object);
@@ -153,12 +152,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 }
 
 
-
-//
-//  FUNKCJA: MyRegisterClass()
-//
-//  PRZEZNACZENIE: Rejestruje klasę okna.
-//
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
     WNDCLASSEXW wcex;
@@ -180,19 +173,9 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     return RegisterClassExW(&wcex);
 }
 
-//
-//   FUNKCJA: InitInstance(HINSTANCE, int)
-//
-//   PRZEZNACZENIE: Zapisuje dojście wystąpienia i tworzy okno główne
-//
-//   KOMENTARZE:
-//
-//        W tej funkcji dojście wystąpienia jest zapisywane w zmiennej globalnej i
-//        jest tworzone i wyświetlane okno główne programu.
-//
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-    hInst = hInstance; // Przechowuj dojście wystąpienia w naszej zmiennej globalnej
+    hInst = hInstance; 
 
     HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
@@ -208,16 +191,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     return TRUE;
 }
 
-//
-//  FUNKCJA: WndProc(HWND, UINT, WPARAM, LPARAM)
-//
-//  PRZEZNACZENIE: Przetwarza komunikaty dla okna głównego.
-//
-//  WM_COMMAND  - przetwarzaj menu aplikacji
-//  WM_PAINT    - Maluj okno główne
-//  WM_DESTROY  - opublikuj komunikat o wyjściu i wróć
-//
-//
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
@@ -263,7 +236,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
-        // Analizuj zaznaczenia menu:
         switch (wmId)
         {
         case IDM_ABOUT:
@@ -329,13 +301,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     int dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
-                    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
-                //hand_position_x_previous = hand_position_x;
-                //hand_position_y_previous = hand_position_y;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -343,7 +312,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDARM_UP:
             for (int i = 1; i <= 32; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
-                //int hand_position_x_previous, hand_position_y_previous;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
@@ -354,25 +322,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
                 arm_position = arm_position - pi / 512;
-                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
-                    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
-                //hand_position_x_previous = hand_position_x;
-                //hand_position_y_previous = hand_position_y;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
             break;
         case IDHAND_DOWN:
-            //MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
             
             for (int i = 1; i <= 32; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
@@ -387,13 +350,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
                 hand_position = hand_position + pi / 512;
-                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
-                    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
@@ -403,7 +364,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             break;
         case IDHAND_UP:
-            //MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
             for (int i = 1; i <= 32; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
@@ -417,13 +377,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     break;
                 }
                 hand_position = hand_position - pi / 512;
-                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
-                    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
@@ -440,8 +398,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
     {
         hdc = BeginPaint(hWnd, &ps);
-        // TODO: Tutaj dodaj kod rysujący używający elementu hdc...
-        //repaintRects(hWnd, hdc, ps, NULL);
         repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
         EndPaint(hWnd, &ps);
     }
@@ -455,7 +411,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// Procedura obsługi komunikatów dla okna informacji o programie.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
@@ -474,14 +429,13 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     return (INT_PTR)FALSE;
 }
 
-// funkcje do przeniesiena do innego cpp
 
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position)
 {
     if (drawArea == NULL)
-        InvalidateRect(hWnd, NULL, TRUE); // repaint all
+        InvalidateRect(hWnd, NULL, TRUE); 
     else
-        InvalidateRect(hWnd, drawArea, TRUE); //repaint drawArea
+        InvalidateRect(hWnd, drawArea, TRUE); 
     hdc = BeginPaint(hWnd, &ps);
     OnPaint(hdc, arm_position, hand_position);
     EndPaint(hWnd, &ps);
@@ -495,7 +449,7 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
     hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
     Graphics graphics(hdc);
-    // Create a Pen object.
+
     Pen blackPen(Color(255, 0, 0, 0), 3);
     Pen bluePen(Color(255, 21, 235, 220), 3);
     Pen redPen(Color(255, 245, 99, 66), 3);
@@ -508,7 +462,6 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
         j++;
     }
     Rect* pRects = rects;
-    // Draw the rectangles.
     graphics.DrawRectangles(&blackPen, pRects, 6);
     graphics.FillRectangles(&greenBrush, rects, 6);
     // rysowanie reki
@@ -519,7 +472,6 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
 
 VOID PAINT_RECTS()
 {
-    // Create an array of Rect objects.
     Rect rect1((hook_x + (2 * free_space) - 1), hook_y - length, length, length);
     Rect rect2((hook_x + (3 * free_space) - 1), hook_y - length, length, length);
     Rect rect3((hook_x + (4 * free_space) - 1), hook_y - length, length, length);
@@ -544,7 +496,6 @@ VOID PAINT_RECTS()
 
 void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy)
 {
-    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
     list<Object>::iterator wsk_object;
     wsk_object = get_itterator_of_object_in_area(object, x, y);
     wsk_object->change_possition(dx, dy, length, length);
@@ -560,7 +511,6 @@ void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
 
 void falling(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy)
 {
-    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
     list<Object>::iterator wsk_object;
     wsk_object = get_itterator_of_object_in_area(object, x, y);
     wsk_object->change_possition(dx, dy, length, length);
@@ -703,8 +653,4 @@ void end_collision(list<Object>& object)
         }
     }
 }
-// klasa obiekt
-// 1. musi wykrywac kolizje
-// 2. musi spadac (czy jest kontakt z podłożem czy nie)
-// 3. musi wykryc czy jest sie chwyconym
-// 4.  
+ 
