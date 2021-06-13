@@ -84,6 +84,8 @@ bool is_in_area_of_object(list<Object>& object, int x, int y);
 bool is_fall(list<Object>& object);
 bool is_collision(list<Object>& object);
 bool is_attached(list<Object>& object);
+int get_dx(float fi1, float fi2);
+int get_dy(float fi1, float fi2);
 //int algorytm_losujacy(int beg, int end);
 
 //koniec
@@ -287,6 +289,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         wsk_object->change_possition(0, 2, length, length);
                         wsk_object->is_attached = true;
                         end_collision(object);
+                        repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                         break;
                     }
                     if ((wsk_object->y + length) == hook_y)
@@ -294,6 +297,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                         wsk_object->y -= 1;
                         wsk_object->change_possition(0, 1, length, length);
                         wsk_object->is_attached = true;
+                        repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                         break;
                     }
                     repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
@@ -308,6 +312,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
+                int ddx, dddx, ddy, dddy;
+                ddx = get_dx(hand_position + arm_position, arm_position);
+                ddy = get_dy(hand_position + arm_position, arm_position);
 
                 if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
@@ -318,9 +325,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
+                    int dx, dy;
+                    dddx = get_dx(hand_position + arm_position, arm_position);
+                    dddy = get_dy(hand_position + arm_position, arm_position);
+                    dx = dddx - ddx;
+                    dy = dddy - ddy;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
@@ -333,6 +345,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
+                int ddx, dddx, ddy, dddy;
+                ddx = get_dx(hand_position + arm_position, arm_position);
+                ddy = get_dy(hand_position + arm_position, arm_position);
+
                 if ((arm_position > 0 && arm_position < pi) || arm_position<-pi && arm_position>-2 * pi || hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     arm_position = arm_position + pi / 512;
@@ -342,11 +358,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
-                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
-                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    dddx = get_dx(hand_position + arm_position, arm_position);
+                    dddy = get_dy(hand_position + arm_position, arm_position);
+                    dx = dddx - ddx;
+                    dy = dddy - ddy;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
@@ -360,6 +378,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
+                int ddx, dddx, ddy, dddy;
+                ddx = get_dx(hand_position + arm_position, arm_position);
+                ddy = get_dy(hand_position + arm_position, arm_position);
 
                 if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
@@ -370,11 +391,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
-                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
-                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    dddx = get_dx(hand_position + arm_position, arm_position);
+                    dddy = get_dy(hand_position + arm_position, arm_position);
+                    dx = dddx - ddx;
+                    dy = dddy - ddy;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.6666666666);
@@ -387,6 +410,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
+                int ddx, dddx, ddy, dddy;
+                ddx = get_dx(hand_position + arm_position, arm_position);
+                ddy = get_dy(hand_position + arm_position, arm_position);
+
 
                 if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
@@ -397,11 +424,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
                     int dx, dy;
-                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
-                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    dddx = get_dx(hand_position + arm_position, arm_position);
+                    dddy = get_dy(hand_position + arm_position, arm_position);
+                    dx = dddx - ddx;
+                    dy = dddy - ddy;
                     make_hold_oobject(hand_position_x, hand_position_y);
                     make_collision(object);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, ddx, ddy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
@@ -521,9 +550,9 @@ void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
     wsk_object->change_possition2(coordinate_x, coordinate_y, length, length);
     wsk_object->is_attached = false;
     wsk_object->is_falling = true;
-    if (is_collision(object) == true)
+    if (wsk_object->is_collison == true)
     {
-        //wsk_object->change_possition(-2 * dx, -2 * dy, length, length);
+        //wsk_object->change_possition2(coordinate_x - 1, coordinate_y - 1, length, length);
         holding = 0;
         end_collision(object);
     }
@@ -536,7 +565,7 @@ void falling(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_po
     wsk_object->change_possition(dx, dy, length, length);
     wsk_object->is_attached = false;
     wsk_object->is_falling = true;
-    if (is_collision(object) == true)
+    if (wsk_object->is_collison == true)
     {
         wsk_object->change_possition(-2 * dx, -2 * dy, length, length);
         holding = 0;
@@ -674,3 +703,71 @@ void end_collision(list<Object>& object)
     }
 }
  
+//dx = hand_length * cos(hand_position(fi1) + arm_position(fi2)) + arm_length * cos(arm_position) + hook_x - hand_position_x;
+//dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+
+int get_dx(float fi1, float fi2)
+{
+    int x, y,z;
+    if (cos(fi1 + fi2) > 0)
+    {
+        if (cos(fi2) > 0)
+        {
+            x = (int)ceil(cos(fi1 + fi2));
+            y = (int)ceil(cos(fi2));
+        }
+        else
+        {
+            x = (int)ceil(cos(fi1 + fi2));
+            y = (int)floor(cos(fi2));
+        }
+    }
+    else
+    {
+        if (cos(fi2) > 0)
+        {
+            x = (int)floor(cos(fi1 + fi2));
+            y = (int)ceil(cos(fi2));
+        }
+        else
+        {
+            x = (int)floor(cos(fi1 + fi2));
+            y = (int)floor(cos(fi2));
+        }
+    }
+    z = hand_length * x + arm_length * y;
+    return z;
+}
+
+int get_y(float fi1, float fi2)
+{
+    int x, y, z;
+    if (sin(fi1 + fi2) > 0)
+    {
+        if (sin(fi2) > 0)
+        {
+            x = (int)ceil(sin(fi1 + fi2));
+            y = (int)ceil(sin(fi2));
+        }
+        else
+        {
+            x = (int)ceil(sin(fi1 + fi2));
+            y = (int)floor(sin(fi2));
+        }
+    }
+    else
+    {
+        if (sin(fi2) > 0)
+        {
+            x = (int)floor(sin(fi1 + fi2));
+            y = (int)ceil(sin(fi2));
+        }
+        else
+        {
+            x = (int)floor(sin(fi1 + fi2));
+            y = (int)floor(sin(fi2));
+        }
+    }
+    z = hand_length * x + arm_length * y;
+    return z;
+}
