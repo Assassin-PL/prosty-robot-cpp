@@ -278,7 +278,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 list<Object>::iterator wsk_object;
                 wsk_object = get_itterator_of_falling_object(object);
-                while (is_fall(object) == true && is_attached(object) == false)
+                while (wsk_object->is_falling == true && wsk_object->is_attached == false)
                 {
                     make_collision(object);
                     wsk_object->y += 1;
