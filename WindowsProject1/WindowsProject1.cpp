@@ -51,7 +51,7 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
 void repaintRects(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
 VOID PAINT_RECTS(HDC hdc);
-void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy);
+void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy, bool r, bool l);
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y);
 list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int x, int y);
 bool is_in_area_of_object(list<Object>& object, int x, int y);
@@ -274,14 +274,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
-                    int dx, dy;
+                    bool r = true, l = true;
+                    float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    if (dx < 0)
+                    {
+                        bool r = 0;
+                    }
+                    else
+                    {
+                        bool r = 1;
+                    }
+                    if (dy < 0)
+                    {
+                        bool l = 0;
+                    }
+                    else
+                    {
+                        bool l = 1;
+                    }
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy, r, l);
                 }
-                hand_position_x_previous = hand_position_x;
-                hand_position_y_previous= hand_position_y;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
@@ -303,11 +318,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
-                    int dx, dy;
+                    bool r = true, l = true;
+                    float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    if (dx < 0)
+                    {
+                        bool r = 0;
+                    }
+                    else
+                    {
+                        bool r = 1;
+                    }
+                    if (dy < 0)
+                    {
+                        bool l = 0;
+                    }
+                    else
+                    {
+                        bool l = 1;
+                    }
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy, r, l);
                 }
                 //hand_position_x_previous = hand_position_x;
                 //hand_position_y_previous = hand_position_y;
@@ -333,11 +365,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
-                    int dx, dy;
+                    bool r = true, l = true;
+                    float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    if (dx < 0)
+                    {
+                        bool r = 0;
+                    }
+                    else
+                    {
+                        bool r = 1;
+                    }
+                    if (dy < 0)
+                    {
+                        bool l = 0;
+                    }
+                    else
+                    {
+                        bool l = 1;
+                    }
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy, r, l);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
@@ -361,11 +410,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
                 {
-                    int dx, dy;
+                    bool r = true, l=true;
+                    float dx, dy;
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    if (dx < 0)
+                    {
+                        bool r = 0;
+                    }
+                    else
+                    {
+                        bool r = 1;
+                    }
+                    if (dy < 0)
+                    {
+                        bool l = 0;
+                    }
+                    else
+                    {
+                        bool l = 1;
+                    }
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy, r, l);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.6666666666);
@@ -510,15 +576,39 @@ VOID PAINT_RECTS(HDC hdc)
     graphics.FillRectangles(&greenBrush, rects, 6);
 }
 
-void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy)
+void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy, bool r, bool l)
 {
     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
     list<Object>::iterator wsk_object;
     wsk_object = get_itterator_of_object_in_area(object, x, y);
-    Rect cycki(wsk_object->x + dx, wsk_object->y - dy ,length, length);
-    wsk_object->x = wsk_object->x + dx;
-    wsk_object->y = wsk_object->y - dy;
-    wsk_object->rectangle = cycki;
+    if (r == 0 && l == 0)
+    {
+        Rect cycki((wsk_object->x - dx), (wsk_object->y - dy), length, length);
+        wsk_object->x = wsk_object->x - dx;
+        wsk_object->y = wsk_object->y - dy;
+        wsk_object->rectangle = cycki;
+    }
+    if (r == 0 && l == 1)
+    {
+        Rect cycki((wsk_object->x - dx), (wsk_object->y + dy), length, length);
+        wsk_object->x = wsk_object->x - dx;
+        wsk_object->y = wsk_object->y + dy;
+        wsk_object->rectangle = cycki;
+    }
+    if (r == 1 && l == 0)
+    {
+        Rect cycki((wsk_object->x + dx), (wsk_object->y - dy), length, length);
+        wsk_object->x = wsk_object->x + dx;
+        wsk_object->y = wsk_object->y - dy;
+        wsk_object->rectangle = cycki;
+    }
+    if (r == 1 && l == 1)
+    {
+        Rect cycki((wsk_object->x + dx), (wsk_object->y + dy), length, length);
+        wsk_object->x = wsk_object->x + dx;
+        wsk_object->y = wsk_object->y + dy;
+        wsk_object->rectangle = cycki;
+    }
 }
 
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y)
