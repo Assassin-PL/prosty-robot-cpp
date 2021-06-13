@@ -20,7 +20,8 @@ public:
     Object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa);
     ~Object();
     void set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa);
-
+    void fall(int width, int height);
+    void change_possition(int dx, int dy, int width, int height);
 private:
 
 };
@@ -45,16 +46,38 @@ void Object::set_object(bool a, bool b, bool c, bool d, int e, int f, Rect dupa)
     y = f;
     rectangle = dupa;
 }
+void Object::fall(int width, int height)
+{
+    x += 1;
+    y += 1;
+    Rect dupa(x, y, width, height);
+    rectangle = dupa;
+}
 
+void Object::change_possition(int dx, int dy, int width, int height)
+{
+    x = x + dx;
+    y = y - dy;
+    Rect dupa(x, y, width, height);
+    rectangle = dupa;
+}
 //do przeniesienia deklaracje nazw funkcji (do pliku naglówkowego .h)
 void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position);
 void repaintRects(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea);
+void make_collision(list<Object>& object);
+void make_hold_oobject(int hand_position_x, int hand_position_y);
+void end_collision(list<Object>& object);
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position);
-VOID PAINT_RECTS(HDC hdc);
+VOID PAINT_RECTS();
 void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy);
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y);
 list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int x, int y);
+list<Object>::iterator get_itterator_of_falling_object(list<Object>& object);
 bool is_in_area_of_object(list<Object>& object, int x, int y);
+bool is_fall(list<Object>& object);
+bool is_collision(list<Object>& object);
+bool is_attached(list<Object>& object);
+int algorytm_losujacy(int beg, int end);
 
 //koniec
 HWND arm_down, arm_up, hand_down, hand_up, hold, drop; //arm to ramie dolne a up to ramie gorne
@@ -100,6 +123,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_WINDOWSPROJECT1, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
+    PAINT_RECTS();
 
     // Wykonaj inicjowanie aplikacji:
     if (!InitInstance(hInstance, nCmdShow))
@@ -255,9 +279,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDDROP:
             MessageBox(NULL, TEXT("button_two_clicked"), TEXT("kakao"), MB_OK | MB_ICONINFORMATION);
             holding = false;
+            if (is_fall(object) == true)
+            {
+                list<Object>::iterator wsk_object;
+                wsk_object = get_itterator_of_falling_object(object);
+                while (is_fall(object) == true && is_attached(object) == false)
+                {
+                    make_collision(object);
+                    wsk_object->y += 1;
+                    wsk_object->change_possition(0, -1, length, length);
+                    if (wsk_object->is_collison == true)
+                    {
+                        wsk_object->y -= 2;
+                        wsk_object->change_possition(0, 2, length, length);
+                        wsk_object->is_attached = true;
+                        end_collision(object);
+                        break;
+                    }
+                    if ((wsk_object->y + length) == hook_y)
+                    {
+                        wsk_object->y -= 1;
+                        wsk_object->change_possition(0, 1, length, length);
+                        wsk_object->is_attached = true;
+                        break;
+                    }
+                    repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                    Sleep(16.66666666666 / 16);
+                }
+            }
             break;
         case IDARM_DOWN:
-            for (int i = 1; i <= 64; i++) {
+            for (int i = 1; i <= 32; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
                 int hand_position_x_previous, hand_position_y_previous;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
@@ -278,16 +330,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+                    make_hold_oobject(hand_position_x, hand_position_y);
+                    make_collision(object);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
-                hand_position_x_previous = hand_position_x;
-                hand_position_y_previous= hand_position_y;
+                //hand_position_x_previous = hand_position_x;
+                //hand_position_y_previous = hand_position_y;
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.66666666666);
             }
             break;
         case IDARM_UP:
-            for (int i = 1; i <= 64; i++) {
+            for (int i = 1; i <= 32; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
                 //int hand_position_x_previous, hand_position_y_previous;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
@@ -307,6 +361,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+                    make_hold_oobject(hand_position_x, hand_position_y);
+                    make_collision(object);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
                 //hand_position_x_previous = hand_position_x;
@@ -317,41 +373,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         case IDHAND_DOWN:
             //MessageBox(NULL, TEXT("button_three_clicked"), TEXT("kawa"), MB_OK | MB_ICONINFORMATION);
-            for (int i = 1; i <= 64; i++) {
+            
+            for (int i = 1; i <= 32; i++) {
                 int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
                 arm_position_x = arm_length * cos(arm_position) + hook_x;
                 arm_position_y = arm_length * sin(arm_position) + hook_y;
                 hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
                 hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                
-                if (hand_position_y > hook_y) {
-                    MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
-                    hand_position = hand_position + pi / 512;
-                    break;
-                }
-                hand_position = hand_position - pi / 512;
-                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
-                {
-                    int dx, dy;
-                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
-                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
-                    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
-                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
-                }
-                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
-                Sleep(16.66666666666);
-            }
-            break;
-        case IDHAND_UP:
-            //MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
-            for (int i = 1; i <= 64; i++) {
-                int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
-                arm_position_x = arm_length * cos(arm_position) + hook_x;
-                arm_position_y = arm_length * sin(arm_position) + hook_y;
-                hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
-                hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
-                
+
                 if (hand_position_y > hook_y) {
                     MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
                     hand_position = hand_position - pi / 512;
@@ -365,10 +394,42 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
                     dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
                     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+                    make_hold_oobject(hand_position_x, hand_position_y);
+                    make_collision(object);
                     which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
                 }
                 repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
                 Sleep(16.6666666666);
+            }
+            break;
+        case IDHAND_UP:
+            //MessageBox(NULL, TEXT("button_four_clicked"), TEXT("czelolada"), MB_OK | MB_ICONINFORMATION);
+            for (int i = 1; i <= 32; i++) {
+                int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
+                arm_position_x = arm_length * cos(arm_position) + hook_x;
+                arm_position_y = arm_length * sin(arm_position) + hook_y;
+                hand_position_x = hand_length * cos(hand_position + arm_position) + arm_position_x;
+                hand_position_y = hand_length * sin(hand_position + arm_position) + arm_position_y;
+
+                if (hand_position_y > hook_y) {
+                    MessageBox(NULL, TEXT("Nie mozna wykonac dalszego ruchu!"), TEXT("za daleko"), MB_OK | MB_ICONINFORMATION);
+                    hand_position = hand_position + pi / 512;
+                    break;
+                }
+                hand_position = hand_position - pi / 512;
+                //repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                if (holding == 1 && is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
+                {
+                    int dx, dy;
+                    dx = hand_length * cos(hand_position + arm_position) + arm_length * cos(arm_position) + hook_x - hand_position_x;
+                    dy = hand_length * sin(hand_position + arm_position) + arm_length * sin(arm_position) + hook_y - hand_position_y;
+                    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+                    make_hold_oobject(hand_position_x, hand_position_y);
+                    make_collision(object);
+                    which_is_hold(hWnd, hdc, ps, NULL, arm_position, hand_position, hand_position_x, hand_position_y, dx, dy);
+                }
+                repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
+                Sleep(16.66666666666);
             }
             break;
         default:
@@ -380,7 +441,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         hdc = BeginPaint(hWnd, &ps);
         // TODO: Tutaj dodaj kod rysujący używający elementu hdc...
-        repaintRects(hWnd, hdc, ps, NULL);
+        //repaintRects(hWnd, hdc, ps, NULL);
         repaintWindow(hWnd, hdc, ps, NULL, arm_position, hand_position);
         EndPaint(hWnd, &ps);
     }
@@ -426,17 +487,6 @@ void repaintWindow(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
     EndPaint(hWnd, &ps);
 }
 
-void repaintRects(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea)
-{
-    if (drawArea == NULL)
-        InvalidateRect(hWnd, NULL, TRUE); // repaint all
-    else
-        InvalidateRect(hWnd, drawArea, TRUE); //repaint drawArea
-    hdc = BeginPaint(hWnd, &ps);
-    PAINT_RECTS(hdc);
-    EndPaint(hWnd, &ps);
-}
-
 VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
 {
     int arm_position_x, arm_position_y, hand_position_x, hand_position_y;
@@ -454,7 +504,7 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     Rect rects[6];
     for (int i = 0; i < 6; i++)
     {
-        rects[i] = get_itterator_of_object(object,j->x,j->y)->rectangle;
+        rects[i] = get_itterator_of_object(object, j->x, j->y)->rectangle;
         j++;
     }
     Rect* pRects = rects;
@@ -467,14 +517,8 @@ VOID OnPaint(HDC hdc, float& arm_position, float& hand_position)
     graphics.DrawLine(&redPen, arm_position_x, arm_position_y, hand_position_x, hand_position_y);//wyswietlanie dloni
 }
 
-VOID PAINT_RECTS(HDC hdc)
+VOID PAINT_RECTS()
 {
-    Graphics graphics(hdc);
-    // Create a Pen object.
-    Pen blackPen(Color(255, 0, 0, 0), 3);
-    Pen bluePen(Color(255, 21, 235, 220), 3);
-    Pen redPen(Color(255, 245, 99, 66), 3);
-    SolidBrush greenBrush(Color(255, 0, 200, 50));
     // Create an array of Rect objects.
     Rect rect1((hook_x + (2 * free_space) - 1), hook_y - length, length, length);
     Rect rect2((hook_x + (3 * free_space) - 1), hook_y - length, length, length);
@@ -496,18 +540,6 @@ VOID PAINT_RECTS(HDC hdc)
     obj1.set_object(0, 0, 0, 1, (hook_x - (4 * free_space) - 1), hook_y - length, rect6);
     object.push_back(obj1);
     //wypelnianie tablicy 
-    Rect rects[] = {
-        get_itterator_of_object(object,(hook_x + (2 * free_space) - 1), hook_y - length)->rectangle,
-        get_itterator_of_object(object,(hook_x + (3 * free_space) - 1), hook_y - length)->rectangle,
-        get_itterator_of_object(object,(hook_x + (4 * free_space) - 1), hook_y - length)->rectangle,
-        get_itterator_of_object(object,(hook_x - (2 * free_space) - 1), hook_y - length)->rectangle,
-        get_itterator_of_object(object,(hook_x - (3 * free_space) - 1), hook_y - length)->rectangle,
-        get_itterator_of_object(object,(hook_x - (4 * free_space) - 1), hook_y - length)->rectangle,
-    };
-    Rect* pRects = rects;
-    // Draw the rectangles.
-    graphics.DrawRectangles(&blackPen, pRects, 6);
-    graphics.FillRectangles(&greenBrush, rects, 6);
 }
 
 void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy)
@@ -515,10 +547,31 @@ void which_is_hold(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& 
     //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
     list<Object>::iterator wsk_object;
     wsk_object = get_itterator_of_object_in_area(object, x, y);
-    Rect cycki(wsk_object->x + dx, wsk_object->y - dy ,length, length);
-    wsk_object->x = wsk_object->x + dx;
-    wsk_object->y = wsk_object->y - dy;
-    wsk_object->rectangle = cycki;
+    wsk_object->change_possition(dx, dy, length, length);
+    wsk_object->is_attached = false;
+    wsk_object->is_falling = true;
+    if (is_collision(object) == true)
+    {
+        wsk_object->change_possition(-2 * dx, -2 * dy, length, length);
+        holding = 0;
+        end_collision(object);
+    }
+}
+
+void falling(HWND hWnd, HDC& hdc, PAINTSTRUCT& ps, RECT* drawArea, float& arm_position, float& hand_position, int x, int y, int dx, int dy)
+{
+    //MessageBox(NULL, TEXT("Twoja stara!"), TEXT("za bliisko"), MB_OK | MB_ICONINFORMATION);
+    list<Object>::iterator wsk_object;
+    wsk_object = get_itterator_of_object_in_area(object, x, y);
+    wsk_object->change_possition(dx, dy, length, length);
+    wsk_object->is_attached = false;
+    wsk_object->is_falling = true;
+    if (is_collision(object) == true)
+    {
+        wsk_object->change_possition(-2 * dx, -2 * dy, length, length);
+        holding = 0;
+        end_collision(object);
+    }
 }
 
 list<Object>::iterator get_itterator_of_object(list<Object>& object, int x, int y)
@@ -543,6 +596,18 @@ list<Object>::iterator get_itterator_of_object_in_area(list<Object>& object, int
     }
 }
 
+list<Object>::iterator get_itterator_of_falling_object(list<Object>& object)
+{
+    for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+    {
+        if (i->is_falling == true)
+        {
+            return i;
+        }
+    }
+}
+
+
 bool is_in_area_of_object(list<Object>& object, int x, int y)
 {
     for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
@@ -550,6 +615,91 @@ bool is_in_area_of_object(list<Object>& object, int x, int y)
         if (x >= (i->x) && x <= (i->x + length) && y >= (i->y) && y <= (i->y + length))
         {
             return true;
+        }
+    }
+}
+
+void make_collision(list<Object>& object)
+{
+    for (list<Object>::iterator j = object.begin(); j != object.end(); ++j)
+    {
+        for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+        {
+            if (i == j) continue;
+            else if (j->x + length < i->x || i->x + length < j->x || j->y + length < i->y || i->y + length < j->y)
+            {
+
+                j->is_collison = false;
+                i->is_collison = false;
+            }
+            else
+            {
+                j->is_collison = true;
+                i->is_collison = true;
+                return;
+            }
+        }
+    }
+}
+
+bool is_fall(list<Object>& object)
+{
+    for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+    {
+        if (i->is_falling == true)
+        {
+            return true;
+        }
+    }
+}
+
+bool is_collision(list<Object>& object)
+{
+    for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+    {
+        if (i->is_collison == true)
+        {
+            return true;
+        }
+    }
+}
+
+bool is_attached(list<Object>& object)
+{
+    for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+    {
+        if (i->is_attached == false)
+        {
+            return false;
+        }
+    }
+}
+
+void make_hold_oobject(int hand_position_x, int hand_position_y)
+{
+    list<Object>::iterator wsk_object;
+    if (is_in_area_of_object(object, hand_position_x, hand_position_y) == true)
+    {
+        if (holding == 1)
+        {
+            wsk_object = get_itterator_of_object_in_area(object, hand_position_x, hand_position_y);
+            wsk_object->is_hold = true;
+        }
+        else
+        {
+            wsk_object = get_itterator_of_object_in_area(object, hand_position_x, hand_position_y);
+            wsk_object->is_hold = true;
+        }
+    }
+}
+
+void end_collision(list<Object>& object)
+{
+    for (list<Object>::iterator i = object.begin(); i != object.end(); ++i)
+    {
+        if (i->is_collison == true)
+        {
+            i->is_collison = false;
         }
     }
 }
